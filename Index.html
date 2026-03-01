@@ -1,87 +1,162 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>互動英語電子書</title>
+    <title>高級千金英文名選集</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Noto+Serif+TC:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        h1 { color: #2c3e50; }
-        .word-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; width: 100%; max-width: 600px; }
-        .word-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
-        .word-text { font-size: 24px; font-weight: bold; margin-bottom: 10px; cursor: pointer; color: #007bff; }
-        .word-text:hover { color: #0056b3; text-decoration: underline; }
-        button { margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; }
-        .btn-record { background: #ff4757; color: white; }
-        .btn-stop { background: #2f3542; color: white; display: none; }
-        .btn-play { background: #2ed573; color: white; display: none; }
-        audio { margin-top: 10px; width: 100%; }
+        body {
+            font-family: 'Playfair Display', 'Noto Serif TC', serif;
+            background-color: #FAFAFA;
+            color: #333;
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: #2C3E50;
+            margin-bottom: 40px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        }
+        .letter-title {
+            font-size: 1.2rem;
+            color: #bdc3c7;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .name-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .name-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .eng-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2C3E50;
+        }
+        .chi-name {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        .play-btn {
+            background-color: transparent;
+            border: 1px solid #2C3E50;
+            color: #2C3E50;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .play-btn:hover {
+            background-color: #2C3E50;
+            color: #FFFFFF;
+        }
+        .play-btn svg {
+            width: 15px;
+            height: 15px;
+            fill: currentColor;
+        }
     </style>
 </head>
 <body>
 
-    <h1>📖 英語詞語練習</h1>
-    <p>點擊單字聽英式發音，錄製後可點擊播放聽回效果。</p>
+    <h1>The Heiress Collection</h1>
 
-    <div class="word-grid" id="grid"></div>
+    <div class="container" id="nameContainer">
+        </div>
 
     <script>
-        // 在這裡輸入你的 7 個詞語
-        const words = ["Apple", "Banana", "Cherry", "Dragonfruit", "Elderberry", "Fig", "Grape"];
+        const namesData = [
+            { letter: 'B', items: [{ eng: 'Blair', chi: '布萊兒' }, { eng: 'Beatrice', chi: '碧翠絲' }] },
+            { letter: 'C', items: [{ eng: 'Celine', chi: '席琳' }, { eng: 'Cressida', chi: '克萊西達' }] },
+            { letter: 'D', items: [{ eng: 'Delphine', chi: '黛爾菲恩' }, { eng: 'Daphne', chi: '達芙妮' }] },
+            { letter: 'S', items: [{ eng: 'Serena', chi: '瑟琳娜' }, { eng: 'Sloane', chi: '斯隆' }] },
+            { letter: 'K', items: [{ eng: 'Katerina', chi: '卡特琳娜' }, { eng: 'Kaia', chi: '凱亞' }] },
+            { letter: 'R', items: [{ eng: 'Rosalind', chi: '羅莎琳德' }, { eng: 'Rowena', chi: '羅威娜' }] }
+        ];
 
-        const grid = document.getElementById('grid');
+        const container = document.getElementById('nameContainer');
 
-        words.forEach((word, index) => {
+        // 生成播放按鈕的 SVG 圖示
+        const playIcon = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+
+        // 渲染網頁內容
+        namesData.forEach(group => {
             const card = document.createElement('div');
-            card.className = 'word-card';
-            card.innerHTML = `
-                <div class="word-text" onclick="speak('${word}')">${word}</div>
-                <button class="btn-record" id="rec-${index}" onclick="startRecording(${index})">🎤 錄音</button>
-                <button class="btn-stop" id="stop-${index}" onclick="stopRecording(${index})">⏹ 停止</button>
-                <button class="btn-play" id="play-${index}" onclick="playRecording(${index})">▶️ 聽回</button>
-            `;
-            grid.appendChild(card);
+            card.className = 'card';
+            
+            const title = document.createElement('div');
+            title.className = 'letter-title';
+            title.innerText = `Letter ${group.letter}`;
+            card.appendChild(title);
+
+            group.items.forEach(name => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'name-item';
+                
+                itemDiv.innerHTML = `
+                    <div class="name-info">
+                        <span class="eng-name">${name.eng}</span>
+                        <span class="chi-name">${name.chi}</span>
+                    </div>
+                    <button class="play-btn" onclick="speakName('${name.eng}')" title="播放發音">
+                        ${playIcon}
+                    </button>
+                `;
+                card.appendChild(itemDiv);
+            });
+
+            container.appendChild(card);
         });
 
-        // 1. 英式發音功能
-        function speak(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-GB'; // 設定為英式英語
-            window.speechSynthesis.speak(utterance);
-        }
-
-        // 2. 錄音功能
-        let recorders = [];
-        let audioChunks = [];
-
-        async function startRecording(index) {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const mediaRecorder = new MediaRecorder(stream);
-            recorders[index] = mediaRecorder;
-            audioChunks[index] = [];
-
-            mediaRecorder.ondataavailable = e => audioChunks[index].push(e.data);
-            mediaRecorder.onstop = () => {
-                const blob = new Blob(audioChunks[index], { type: 'audio/wav' });
-                const url = URL.createObjectURL(blob);
-                window[`audioUrl-${index}`] = url;
-                document.getElementById(`play-${index}`).style.display = 'inline-block';
-            };
-
-            mediaRecorder.start();
-            document.getElementById(`rec-${index}`).style.display = 'none';
-            document.getElementById(`stop-${index}`).style.display = 'inline-block';
-        }
-
-        function stopRecording(index) {
-            recorders[index].stop();
-            document.getElementById(`stop-${index}`).style.display = 'none';
-            document.getElementById(`rec-${index}`).style.display = 'inline-block';
-        }
-
-        function playRecording(index) {
-            const audio = new Audio(window[`audioUrl-${index}`]);
-            audio.play();
+        // 語音播放功能 (使用瀏覽器內建 API)
+        function speakName(text) {
+            // 檢查瀏覽器是否支援
+            if ('speechSynthesis' in window) {
+                // 先停止正在播放的聲音
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                // 設定為英文發音 (en-GB 帶有英國口音，更符合古典老錢風，若想換美音可改為 en-US)
+                utterance.lang = 'en-GB'; 
+                utterance.rate = 0.85; // 稍微放慢語速，顯得更優雅
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("抱歉，您的瀏覽器不支援語音播放功能。");
+            }
         }
     </script>
 </body>
